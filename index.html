@@ -386,6 +386,11 @@ body{font-family:'Inter',sans-serif;background:var(--slide-bg);color:var(--gray-
 [data-theme="white"] .logo-img{
   filter: none;
 }
+
+/* ── TAXA BUTTONS ── */
+.taxa-btn{background:var(--navy-card2);border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-family:var(--sans);font-size:12px;font-weight:600;color:var(--gray-2);cursor:pointer;transition:all .18s}
+.taxa-btn:hover{border-color:var(--accent-border);color:var(--gray-1)}
+.taxa-btn.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent)}
 </style>
 </head>
 <body>
@@ -422,6 +427,10 @@ body{font-family:'Inter',sans-serif;background:var(--slide-bg);color:var(--gray-
     <div class="field-row">
       <div class="field"><label>Nome do paciente</label><input type="text" id="cfg-cliente" placeholder="Ex: João Silva"></div>
       <div class="field"><label>Perfil / Contexto</label><input type="text" id="cfg-segmento" placeholder="Ex: Executivo, 45 anos, atleta amador"></div>
+    </div>
+    <div class="field">
+      <label>Título do PDF <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--gray-3)">(opcional — padrão: Proposta-DraBarbara-[Nome])</span></label>
+      <input type="text" id="cfg-titulo-pdf" placeholder="Ex: Proposta-Programa-Hormonal-João">
     </div>
   </div>
 
@@ -529,22 +538,45 @@ body{font-family:'Inter',sans-serif;background:var(--slide-bg);color:var(--gray-
     </div>
     <!-- PARCELAMENTO -->
     <div style="background:var(--navy-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px 28px;margin-bottom:14px">
-      <div style="font-size:10px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:var(--accent);margin-bottom:16px;display:flex;align-items:center;gap:10px">Formas de pagamento <span style="flex:1;height:1px;background:var(--border);display:block"></span></div>
+      <div style="font-size:10px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:var(--accent);margin-bottom:16px;display:flex;align-items:center;gap:10px">Parcelamento <span style="flex:1;height:1px;background:var(--border);display:block"></span></div>
+
+      <!-- Modo de taxa -->
+      <div style="margin-bottom:16px">
+        <div style="font-size:10px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--gray-2);margin-bottom:8px">Como tratar as taxas do cartão:</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="taxa-btn active" data-modo="assumir" onclick="setModoTaxa('assumir')">Assumir as taxas</button>
+          <button class="taxa-btn" data-modo="repassar" onclick="setModoTaxa('repassar')">Repassar as taxas</button>
+          <button class="taxa-btn" data-modo="definir" onclick="setModoTaxa('definir')">Definir manualmente</button>
+        </div>
+        <div class="field-hint" id="taxa-hint" style="margin-top:8px">Paciente paga o valor cheio dividido pelas parcelas. Você absorve a taxa da operadora.</div>
+      </div>
+
       <div class="field-row">
         <div class="field">
           <label>Nº de parcelas</label>
-          <input type="number" id="cfg-parcelas" placeholder="Ex: 12" min="1" max="60">
+          <input type="number" id="cfg-parcelas" placeholder="Ex: 12" min="1" max="60" oninput="calcParcela()">
         </div>
-        <div class="field">
+        <!-- Repassar: campo de taxa % -->
+        <div class="field" id="campo-taxa" style="display:none">
+          <label>Taxa da operadora (%)</label>
+          <input type="number" id="cfg-taxa-pct" placeholder="Ex: 4.5" min="0" max="30" step="0.1" oninput="calcParcela()">
+        </div>
+        <!-- Definir: campo manual -->
+        <div class="field" id="campo-parcela-manual" style="display:none">
           <label>Valor da parcela (R$)</label>
-          <input type="number" id="cfg-valor-parcela" placeholder="Calculado automaticamente" id="cfg-parcela-display" readonly style="opacity:.7;cursor:not-allowed">
+          <input type="number" id="cfg-valor-parcela-manual" placeholder="Ex: 450,00" min="0" oninput="calcParcela()">
+        </div>
+        <!-- Preview calculado -->
+        <div class="field" id="campo-parcela-preview">
+          <label>Valor da parcela</label>
+          <input type="text" id="cfg-parcela-display" placeholder="—" readonly style="opacity:.6;cursor:not-allowed">
         </div>
       </div>
+
       <div class="field" style="margin-bottom:0">
         <label>Descrição da forma de pagamento</label>
         <input type="text" id="cfg-pagamento-desc" placeholder="Ex: Cartão de crédito em até 12x · Pix à vista · Boleto parcelado">
       </div>
-      <div class="field-hint">A parcela será calculada automaticamente se você preencher o valor total e o número de parcelas.</div>
     </div>
 
     <div class="cond-cfg">
@@ -1053,9 +1085,22 @@ function launchPresentation(){
   const pagamentoEl = document.getElementById('s7-pagamento');
 
   if(parcelas && valor && parseInt(parcelas) > 1){
-    const vlrParcela = parseFloat(valor)/parseInt(parcelas);
-    parcelaEl.style.display = 'block';
-    parcelaEl.innerHTML = `ou <strong style="color:var(--accent)">${parcelas}x</strong> de <strong style="color:var(--accent)">${fmt(vlrParcela)}</strong>`;
+    // Pegar o valor da parcela já calculado pelo campo de display (ou manual)
+    let vlrParcela = 0;
+    if(modoTaxa === 'definir'){
+      vlrParcela = parseFloat(document.getElementById('cfg-valor-parcela-manual').value) || 0;
+    } else {
+      // Extrair do campo display (já formatado) ou recalcular
+      const taxa = modoTaxa === 'repassar' ? (parseFloat(document.getElementById('cfg-taxa-pct').value)||0) : 0;
+      const totalComTaxa = parseFloat(valor) * (1 + taxa/100);
+      vlrParcela = totalComTaxa / parseInt(parcelas);
+    }
+    if(vlrParcela > 0){
+      parcelaEl.style.display = 'block';
+      parcelaEl.innerHTML = `ou <strong style="color:var(--accent)">${parcelas}x</strong> de <strong style="color:var(--accent)">${fmt(vlrParcela)}</strong>`;
+    } else {
+      parcelaEl.style.display = 'none';
+    }
   } else {
     parcelaEl.style.display = 'none';
   }
@@ -1208,40 +1253,76 @@ document.addEventListener('keydown',e=>{
 // PDF
 // ════════════════════════════════════
 async function downloadPDF(){
-  document.getElementById('pdf-overlay').classList.add('show');
-  await new Promise(r=>setTimeout(r,100));
+  const overlay = document.getElementById('pdf-overlay');
+  overlay.classList.add('show');
+  await new Promise(r => setTimeout(r, 150));
+
+  const nav = document.querySelector('.pres-nav');
+  nav.style.display = 'none';
+
+  const savedIndex = currentIndex;
+
   try {
-    const nav = document.querySelector('.pres-nav');
-    const watermark = document.getElementById('pdf-overlay');
-    nav.style.display='none';
-    const savedIndex = currentIndex;
-    const pdf = new window.jspdf.jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
-    for(let i=0;i<activeSlides.length;i++){
+    // Verificar libs
+    if(typeof html2canvas === 'undefined') throw new Error('html2canvas não carregado');
+    const jsPDFLib = (window.jspdf && window.jspdf.jsPDF)
+      || (window.jsPDF)
+      || (typeof jsPDF !== 'undefined' ? jsPDF : null);
+    if(!jsPDFLib) throw new Error('jsPDF não carregado');
+
+    const pdf = new jsPDFLib({orientation:'landscape', unit:'mm', format:'a4'});
+    const PW = 297, PH = 210;
+
+    for(let i = 0; i < activeSlides.length; i++){
       goToIndex(i);
-      await new Promise(r=>setTimeout(r,400));
-      const slide = document.getElementById('slide-'+activeSlides[i]);
+      await new Promise(r => setTimeout(r, 500));
+
+      const slide = document.getElementById('slide-' + activeSlides[i]);
       if(!slide) continue;
-      slide.style.minHeight='unset';
-      const canvas = await html2canvas(slide,{scale:1.5,useCORS:true,backgroundColor:'#111926',logging:false,windowWidth:1180,windowHeight:664});
-      slide.style.minHeight='';
-      const imgData = canvas.toDataURL('image/jpeg',0.92);
-      if(i>0) pdf.addPage();
-      const pw=297,ph=210;
-      const cr=canvas.width/canvas.height, pr=pw/ph;
-      let dw,dh,dx,dy;
-      if(cr>pr){dw=pw;dh=pw/cr;dx=0;dy=(ph-dh)/2;}else{dh=ph;dw=ph*cr;dy=0;dx=(pw-dw)/2;}
-      pdf.addImage(imgData,'JPEG',dx,dy,dw,dh);
+
+      // Garantir que o slide está visível e sem minHeight para captura
+      const origMinH = slide.style.minHeight;
+      slide.style.minHeight = 'unset';
+
+      const canvas = await html2canvas(slide, {
+        scale: 1.8,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: getComputedStyle(document.documentElement)
+          .getPropertyValue('--slide-bg').trim() || '#111926',
+        logging: false,
+        width: slide.scrollWidth,
+        height: slide.scrollHeight,
+      });
+
+      slide.style.minHeight = origMinH;
+
+      const imgData = canvas.toDataURL('image/jpeg', 0.93);
+      if(i > 0) pdf.addPage();
+
+      const cr = canvas.width / canvas.height;
+      const pr = PW / PH;
+      let dw, dh, dx, dy;
+      if(cr > pr){ dw=PW; dh=PW/cr; dx=0; dy=(PH-dh)/2; }
+      else        { dh=PH; dw=PH*cr; dy=0; dx=(PW-dw)/2; }
+      pdf.addImage(imgData, 'JPEG', dx, dy, dw, dh);
     }
+
     goToIndex(savedIndex);
-    nav.style.display='';
-    const cliente = document.getElementById('cfg-cliente').value.trim()||'Paciente';
-    pdf.save(`Proposta-DraBarbara-${cliente.replace(/\s+/g,'-')}.pdf`);
-  } catch(err){
-    console.error(err);
-    alert('Erro ao gerar PDF. Tente novamente.');
+    nav.style.display = '';
+
+    const cliente = document.getElementById('cfg-cliente').value.trim() || 'Paciente';
+    const tituloCustom = document.getElementById('cfg-titulo-pdf') ? document.getElementById('cfg-titulo-pdf').value.trim() : '';
+    const nomeArq = tituloCustom || ('Proposta-DraBarbara-' + cliente.replace(/\s+/g,'-'));
+    pdf.save(nomeArq + '.pdf');
+
+  } catch(err) {
+    goToIndex(savedIndex);
+    nav.style.display = '';
+    console.error('Erro PDF:', err);
+    alert('Erro ao gerar PDF: ' + err.message);
   } finally {
-    document.getElementById('pdf-overlay').classList.remove('show');
-    document.querySelector('.pres-nav').style.display='';
+    overlay.classList.remove('show');
   }
 }
 
@@ -1270,19 +1351,56 @@ buildResolverConfig();
 addVideoField();
 refreshToggles();
 
-// Auto-calcular parcela
+// ════════════════════════════════════
+// PARCELAMENTO
+// ════════════════════════════════════
+let modoTaxa = 'assumir';
+
+const TAXA_HINTS = {
+  assumir: 'Paciente paga o valor cheio dividido pelas parcelas. Você absorve a taxa da operadora.',
+  repassar: 'A taxa da operadora é embutida no valor da parcela. O paciente arca com o custo.',
+  definir: 'Você define manualmente o valor de cada parcela exibido na proposta.',
+};
+
+function setModoTaxa(modo){
+  modoTaxa = modo;
+  document.querySelectorAll('.taxa-btn').forEach(b => b.classList.toggle('active', b.dataset.modo === modo));
+  document.getElementById('taxa-hint').textContent = TAXA_HINTS[modo];
+  document.getElementById('campo-taxa').style.display = modo === 'repassar' ? '' : 'none';
+  document.getElementById('campo-parcela-manual').style.display = modo === 'definir' ? '' : 'none';
+  document.getElementById('campo-parcela-preview').style.display = modo === 'definir' ? 'none' : '';
+  calcParcela();
+}
+
 function calcParcela(){
   const total = parseFloat(document.getElementById('cfg-valor').value);
   const n = parseInt(document.getElementById('cfg-parcelas').value);
-  const el = document.getElementById('cfg-valor-parcela');
-  if(total && n && n > 0){
-    el.value = (total/n).toFixed(2).replace('.',',');
-  } else {
-    el.value = '';
+  const display = document.getElementById('cfg-parcela-display');
+
+  if(!total || !n || n < 1){ if(display) display.value = ''; return; }
+
+  let parcela = 0;
+
+  if(modoTaxa === 'assumir'){
+    parcela = total / n;
+  } else if(modoTaxa === 'repassar'){
+    const taxa = parseFloat(document.getElementById('cfg-taxa-pct').value) || 0;
+    const totalComTaxa = total * (1 + taxa / 100);
+    parcela = totalComTaxa / n;
+  } else if(modoTaxa === 'definir'){
+    const manual = parseFloat(document.getElementById('cfg-valor-parcela-manual').value);
+    parcela = manual || 0;
   }
+
+  if(display) display.value = parcela > 0
+    ? 'R$ ' + parcela.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2})
+    : '';
 }
-document.getElementById('cfg-valor').addEventListener('input', calcParcela);
-document.getElementById('cfg-parcelas').addEventListener('input', calcParcela);
+
+document.addEventListener('DOMContentLoaded', () => {
+  const valorInput = document.getElementById('cfg-valor');
+  if(valorInput) valorInput.addEventListener('input', calcParcela);
+});
 </script>
 <script>/*!
  * html2canvas 1.4.1 <https://html2canvas.hertzen.com>
