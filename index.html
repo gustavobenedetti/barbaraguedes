@@ -206,7 +206,7 @@ body{font-family:'Inter',sans-serif;min-height:100vh;overflow-x:hidden;-webkit-f
 .toggle-row.locked{opacity:.5}
 .toggle-row.off{opacity:.35}
 .toggle-left{display:flex;align-items:center;gap:10px}
-.toggle-num{font-size:10px;font-weight:700;color:var(--accent);background:var(--accent-dim);border:1px solid rgba(200,183,227,0.12);border-radius:5px;padding:3px 8px;min-width:26px;text-align:center}
+.toggle-num{font-size:10px;font-weight:700;color:var(--accent);background:var(--accent-dim);border:1px solid var(--accent-border);border-radius:5px;padding:3px 8px;min-width:26px;text-align:center}
 .toggle-num.dim{color:var(--text-muted);background:transparent;border-color:var(--border)}
 .toggle-name{font-size:13px;font-weight:500;color:var(--text-sub)}
 .toggle-badge{font-size:10px;color:var(--text-muted);margin-left:4px}
@@ -1205,11 +1205,9 @@ async function downloadPDF() {
 
     // Coletar estilos da página atual
     const allStyles = Array.from(document.querySelectorAll('style'))
-      .map(s => s.innerHTML).join('
-');
+      .map(s => s.innerHTML).join('\n');
     const allLinks  = Array.from(document.querySelectorAll('link[rel="stylesheet"]'))
-      .map(l => `<link rel="stylesheet" href="${l.href}">`).join('
-');
+      .map(l => `<link rel="stylesheet" href="${l.href}">`).join('\n');
     const theme     = document.documentElement.getAttribute('data-theme') || 'dark';
     const bg        = getComputedStyle(document.documentElement)
                         .getPropertyValue('--bg').trim() || '#0d0d0d';
@@ -1267,7 +1265,7 @@ ${slide.outerHTML.replace(/class="slide[^"]*"/, 'class="slide active"')}
 </body>
 </html>`;
 
-      // Criar iframe oculto com dimensões exatas
+      // Criar iframe oculto com dimensões exatas de A4
       const iframe = document.createElement('iframe');
       Object.assign(iframe.style, {
         position: 'fixed', top: '-9999px', left: '-9999px',
@@ -1277,28 +1275,29 @@ ${slide.outerHTML.replace(/class="slide[^"]*"/, 'class="slide active"')}
       });
       document.body.appendChild(iframe);
 
-      // Escrever conteúdo no iframe e aguardar carregamento
-      iframe.contentDocument.open();
-      iframe.contentDocument.write(slideHTML);
-      iframe.contentDocument.close();
+      let canvas;
+      try {
+        iframe.contentDocument.open();
+        iframe.contentDocument.write(slideHTML);
+        iframe.contentDocument.close();
 
-      // Aguardar fontes e imagens
-      await new Promise(r => setTimeout(r, 800));
+        await new Promise(r => setTimeout(r, 800));
 
-      // Capturar o body do iframe
-      const canvas = await html2canvas(iframe.contentDocument.body, {
-        scale:           1.5,
-        useCORS:         true,
-        allowTaint:      true,
-        logging:         false,
-        backgroundColor: bg,
-        width:           SLIDE_W,
-        height:          SLIDE_H,
-        windowWidth:     SLIDE_W,
-        windowHeight:    SLIDE_H,
-      });
-
-      document.body.removeChild(iframe);
+        canvas = await html2canvas(iframe.contentDocument.body, {
+          scale:       1.5,
+          useCORS:     true,
+          allowTaint:  true,
+          logging:     false,
+          backgroundColor: bg,
+          width:       SLIDE_W,
+          height:      SLIDE_H,
+          windowWidth: SLIDE_W,
+          windowHeight:SLIDE_H,
+        });
+      } finally {
+        // Garante remoção do iframe mesmo em caso de erro
+        if (iframe.parentNode) document.body.removeChild(iframe);
+      }
 
       if (i > 0) JPDF_inst.addPage();
       // Encaixar exatamente no A4 (mesma proporção, sem margens)
@@ -1323,6 +1322,7 @@ ${slide.outerHTML.replace(/class="slide[^"]*"/, 'class="slide active"')}
     alert('Erro ao gerar PDF: ' + err.message);
   } finally {
     overlay.classList.remove('show');
+    document.querySelector('.pres-nav').style.visibility = '';
   }
 }
 
