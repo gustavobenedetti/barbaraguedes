@@ -617,7 +617,7 @@ body{font-family:'Inter',sans-serif;min-height:100vh;overflow-x:hidden;-webkit-f
   <!-- SLIDE 2 — ESPECIALIDADES -->
   <div class="slide" id="slide-2" data-sid="2">
     <div class="slide-eyebrow">Expertise</div>
-    <div class="slide-title">No que somos<br><em>especialistas:</em></div>
+    <div class="slide-title">No que sou<br><em>especialista:</em></div>
     <div class="slide-sub">As áreas que integram este programa personalizado</div>
     <div class="esp-grid" id="s2-esp"></div>
   </div>
@@ -625,7 +625,7 @@ body{font-family:'Inter',sans-serif;min-height:100vh;overflow-x:hidden;-webkit-f
   <!-- SLIDE 3 — ENTREGÁVEIS -->
   <div class="slide" id="slide-3" data-sid="3">
     <div class="slide-eyebrow">Escopo do Programa</div>
-    <div class="slide-title">O que está<br><em>incluído:</em></div>
+    <div class="slide-title">O que está<br><em>incluso:</em></div>
     <div class="slide-sub">Tudo que será entregue ao longo do seu programa</div>
     <div class="entregaveis-box" id="s3-ent">—</div>
   </div>
@@ -699,12 +699,12 @@ body{font-family:'Inter',sans-serif;min-height:100vh;overflow-x:hidden;-webkit-f
 // DADOS
 // ════════════════════════════════════
 const ESPECIALIDADES = [
-  {id:'hormonal',   icon:'🧬', name:'Medicina Hormonal',    desc:'Reposição hormonal bioidentical, otimização de testosterona e hormônios do bem-estar para máxima vitalidade.'},
-  {id:'urologico',  icon:'🔬', name:'Urologia Clínica',     desc:'Saúde urológica masculina e feminina, disfunções sexuais, incontinência, infertilidade e cuidados preventivos.'},
-  {id:'performance',icon:'⚡', name:'Performance Física',   desc:'Protocolo integrado de treinamento, suplementação e recuperação para alta performance.'},
-  {id:'nutricao',   icon:'🌿', name:'Nutrição Funcional',   desc:'Estratégias nutricionais personalizadas para composição corporal, suporte hormonal e longevidade.'},
-  {id:'estetica',   icon:'✨', name:'Estética Clínica',     desc:'Procedimentos de rejuvenescimento e harmonização corporal integrados ao protocolo de saúde.'},
-  {id:'longevidade',icon:'⏳', name:'Longevidade & Antiaging','desc':'Protocolos baseados em evidências para manter vitalidade e qualidade de vida a longo prazo.'},
+  {id:'hormonal',    icon:'🧬', name:'Medicina Hormonal',          desc:'Avaliação e acompanhamento do eixo hormonal, recuperação natural, metabolismo e composição corporal, com estratégias individualizadas para otimizar saúde, energia e vitalidade.'},
+  {id:'urologico',   icon:'♟', name:'Urologia Clínica',            desc:'Cuidado integral da saúde urológica masculina, com atenção à função sexual, fertilidade, prevenção e às diferentes fases da vida.'},
+  {id:'performance', icon:'⚡', name:'Performance Física',          desc:'Estratégias personalizadas para integrar treinamento, recuperação, composição corporal e saúde metabólica à sua rotina e aos seus objetivos.'},
+  {id:'nutricao',    icon:'🌿', name:'Nutrição & Metabolismo',      desc:'Estratégias nutricionais individualizadas para melhorar composição corporal, saúde metabólica, energia e resposta do organismo.'},
+  {id:'longevidade', icon:'⌛', name:'Longevidade & Vitalidade',    desc:'Acompanhamento baseado em evidências para preservar função, autonomia, saúde e qualidade de vida ao longo dos anos.'},
+  {id:'corpo',       icon:'🧠', name:'Conhecimento do Próprio Corpo', desc:'Você aprende a compreender seus sinais, exames, respostas e necessidades para tomar melhores decisões e assumir o governo da própria saúde.'},
 ];
 
 const RESOLVER_DEFAULTS = {
@@ -768,6 +768,32 @@ Toxina botulínica, bioestimuladores ou preenchedores conforme indicação
 Harmonização corporal integrada ao tratamento hormonal
 <b>Manutenção e Resultado</b>
 Retorno de avaliação de resultado e protocolo de manutenção`,
+
+  padrao:`<b>📋 Avaliação Inicial</b>
+Avaliação física completa + composição corporal <i>(bioimpedância — início e fim)</i>
+Coleta de teste alimentar imunológico <i>(180-270 tipos de alimentos)</i>
+Coleta e análise de exames laboratoriais <i>(início e fim)</i>
+Análise de perfil comportamento
+
+<b>🗺️ Estratégia Personalizada</b>
+Avaliação e personalização da rotina: alimentação, treinamento, sono, descanso e hábitos
+Definição de rota do estado atual → estado desejado
+Entrega da metodologia de 3 semanas "Reset" <i>(pré-teste)</i>
+Estratégia alimentar inicial guiada por teste de sensibilidade
+Orientação de mentalidade e comportamento de acordo com o perfil
+
+<b>🤝 Acompanhamento Contínuo</b>
+Encontros individuais a cada 14 dias | aprox. 1 hora | presencial ou online
+Orientação prática com a Dra. <i>(almoço, podendo incluir cônjuge)</i> → escolhas alimentares
+Orientação e ajustes de suplementação, quando indicados
+Ajustes de tratamento/condutas médicas quando indicados
+Caso indicado reposição, realizada aplicação
+Alinhamento com treinador, nutricionista ou outro profissional, quando necessário
+
+<b>📲 Suporte & Recursos</b>
+Canal para dúvidas e orientações práticas
+Grupo de WhatsApp
+Manual da testosterona natural`,
 };
 
 // ════════════════════════════════════
@@ -821,16 +847,45 @@ function inserirModelo(tipo) {
 }
 function inserirTudo() {
   limparEditor();
-  Object.keys(MODELOS).forEach((k, i) => {
-    const ed = document.getElementById('cfg-entregaveis');
-    if (i > 0) ed.innerHTML += '<div>&nbsp;</div>';
-    inserirModelo(k);
-  });
+  inserirModelo('padrao');
 }
 
 // ════════════════════════════════════
 // CRONOGRAMA (config)
 // ════════════════════════════════════
+// Conteúdo padrão do cronograma
+const CRONO_PADRAO = {
+  1: [
+    {text:'Avaliação física completa + composição corporal (bioimpedância)', bold:true},
+    {text:'Coleta de teste alimentar imunológico (180-270 tipos de alimentos)', bold:false},
+    {text:'Coleta e análise de exames laboratoriais', bold:false},
+    {text:'Análise de perfil comportamento', bold:false},
+    {text:'Avaliação e personalização da rotina: alimentação, treinamento, sono, descanso e hábitos', bold:false},
+    {text:'Orientação prática com a Dra. (almoço, podendo incluir cônjuge) → escolhas alimentares', bold:false},
+    {text:'Entrega da metodologia de 3 semanas "Reset" (pré-teste)', bold:false},
+    {text:'Definição de rota do estado atual → estado desejado', bold:false},
+  ],
+  2: [
+    {text:'Estratégia alimentar inicial guiada por teste de sensibilidade', bold:true},
+    {text:'Alinhamento com treinador, nutricionista ou outro profissional, quando houver necessidade', bold:false},
+    {text:'Orientação de mentalidade e comportamento de acordo com o perfil', bold:false},
+    {text:'Orientação e ajustes de suplementação, quando indicados', bold:false},
+  ],
+  3: [
+    {text:'Reavaliações quinzenais', bold:true},
+    {text:'Ajuste / alteração do plano', bold:false},
+    {text:'Orientação e esclarecimento (autoconhecimento)', bold:false},
+  ],
+  4: [
+    {text:'Avaliação física + composição corporal (bioimpedância)', bold:true},
+    {text:'Pack de exames laboratoriais + análise', bold:false},
+    {text:'Reavaliação dos objetivos e resultados alcançados', bold:false},
+    {text:'Orientação prática com a Dra. (podendo incluir cônjuge)', bold:false},
+    {text:'Avaliação da evolução nos 3 meses', bold:false},
+    {text:'Identificação das próximas necessidades', bold:false},
+  ],
+};
+
 function buildCronoConfig() {
   const n = parseInt(document.getElementById('cfg-etapas').value) || 4;
   // Checkboxes
@@ -849,7 +904,7 @@ function getActiveWeeks() {
 function buildCronoBlocks() {
   const weeks = getActiveWeeks();
   const wrap  = document.getElementById('crono-cfg-list');
-  // Preservar valores existentes
+  // Preservar valores existentes; fallback para padrão da médica
   const saved = {};
   wrap.querySelectorAll('.crono-block').forEach(b => {
     saved[b.dataset.week] = Array.from(b.querySelectorAll('.crono-line-row')).map(r => ({
@@ -857,15 +912,16 @@ function buildCronoBlocks() {
       bold: r.querySelector('.crono-bold-btn').classList.contains('on'),
     }));
   });
-  wrap.innerHTML = weeks.map(w => `
-    <div class="crono-block" data-week="${w}">
+  wrap.innerHTML = weeks.map(w => {
+    const linhas = saved[w] || CRONO_PADRAO[w] || [{text:'',bold:false}];
+    return `<div class="crono-block" data-week="${w}">
       <div class="crono-block-label">Etapa ${w}</div>
       <div class="crono-lines" id="crono-lines-${w}">
-        ${(saved[w] || [{text:'',bold:false}]).map(l => cronoLineHTML(w,l.text,l.bold)).join('')}
+        ${linhas.map(l => cronoLineHTML(w,l.text,l.bold)).join('')}
       </div>
       <button class="btn-add" onclick="addCronoLine(${w})">+ Adicionar atividade</button>
-    </div>
-  `).join('');
+    </div>`;
+  }).join('');
 }
 function cronoLineHTML(w, text='', bold=false) {
   return `<div class="crono-line-row">
