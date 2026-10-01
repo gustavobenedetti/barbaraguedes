@@ -413,13 +413,26 @@ body{font-family:'Inter',sans-serif;min-height:100vh;overflow-x:hidden;-webkit-f
   <!-- ENTREGÁVEIS -->
   <div class="cfg-card">
     <div class="cfg-title">Entregáveis do Programa</div>
-    <span class="modelos-label">Modelos de entregáveis:</span>
+
+    <span class="modelos-label">Acompanhamento base:</span>
+    <div class="modelos-row">
+      <button class="modelo-btn all" onmousedown="event.preventDefault();inserirModelo('encontros3')">3 encontros — 1 a cada 30 dias</button>
+      <button class="modelo-btn all" onmousedown="event.preventDefault();inserirModelo('encontros6')">6 encontros — 1 a cada 14 dias</button>
+    </div>
+
+    <span class="modelos-label">Entregáveis opcionais:</span>
+    <div class="modelos-row">
+      <button class="modelo-btn" onmousedown="event.preventDefault();inserirModelo('hormonal_apl')">💉 Aplicação Hormonal</button>
+      <button class="modelo-btn" onmousedown="event.preventDefault();inserirModelo('exames')">🧪 Exames Laboratoriais</button>
+      <button class="modelo-btn" onmousedown="event.preventDefault();inserirModelo('teste180')">🥦 Teste Imunológico 180</button>
+      <button class="modelo-btn" onmousedown="event.preventDefault();inserirModelo('teste270')">🥦 Teste Imunológico 270</button>
+      <button class="modelo-btn" onmousedown="event.preventDefault();inserirModelo('bioimpedancia')">📊 Bioimpedância</button>
+      <button class="modelo-btn" onmousedown="event.preventDefault();inserirModelo('digitais')">📲 Entregáveis Digitais</button>
+    </div>
+
+    <span class="modelos-label">Atalhos:</span>
     <div class="modelos-row">
       <button class="modelo-btn all" onmousedown="event.preventDefault();inserirTudo()">⚡ Inserir tudo</button>
-      <button class="modelo-btn" onmousedown="event.preventDefault();inserirModelo('hormonal')">🧬 Hormonal</button>
-      <button class="modelo-btn" onmousedown="event.preventDefault();inserirModelo('performance')">⚡ Performance</button>
-      <button class="modelo-btn" onmousedown="event.preventDefault();inserirModelo('urologico')">🔬 Urológico</button>
-      <button class="modelo-btn" onmousedown="event.preventDefault();inserirModelo('estetica')">✨ Estética</button>
       <button class="modelo-btn clear" onmousedown="event.preventDefault();limparEditor()">✕ Limpar</button>
     </div>
     <div class="rtb">
@@ -769,31 +782,78 @@ Harmonização corporal integrada ao tratamento hormonal
 <b>Manutenção e Resultado</b>
 Retorno de avaliação de resultado e protocolo de manutenção`,
 
+  // Acompanhamento base
+  encontros3:`<b>Acompanhamento Médico — 3 Encontros</b>
+3 consultas individuais ao longo de 3 meses, com duração aproximada de 1 hora cada;
+Frequência de 1 encontro a cada 30 dias;
+Conduzidos de forma presencial ou online, conforme preferência;
+Orientação prática e personalizada em cada encontro, adaptada à rotina do paciente;`,
+
+  encontros6:`<b>Acompanhamento Médico — 6 Encontros</b>
+6 consultas individuais ao longo de 3 meses, com duração aproximada de 1 hora cada;
+Frequência de 1 encontro a cada 14 dias;
+Conduzidos de forma presencial ou online, conforme preferência;
+Orientação prática e personalizada em cada encontro, adaptada à rotina do paciente;`,
+
+  // Entregáveis opcionais
+  hormonal_apl:`<b>Aplicação Hormonal Trimestral</b>
+Hormônio de ação trimestral com até 2 aplicações no ciclo;
+Primeira aplicação no início do ciclo e segunda ao final dos 3 meses;
+Acompanhamento da resposta clínica ao longo do período;`,
+
+  exames:`<b>Pacote de Exames Laboratoriais</b>
+Exames de sangue completos solicitados e monitorados diretamente pela Dra.
+Inclui painel inicial e reavaliação ao final do ciclo de 3 meses;
+Coleta realizada em laboratório parceiro — o paciente vai apenas coletar;
+Resultados analisados e interpretados em consulta;`,
+
+  teste180:`<b>Teste de Sensibilidade Alimentar — 180 Alimentos</b>
+Teste imunológico alimentar com análise de 180 tipos de alimentos;
+Identificação de inflamações e intolerâncias alimentares individuais;
+Base para construção da estratégia alimentar personalizada;`,
+
+  teste270:`<b>Teste de Sensibilidade Alimentar — 270 Alimentos</b>
+Teste imunológico alimentar com análise de 270 tipos de alimentos;
+Mapeamento ampliado de sensibilidades e reações inflamatórias;
+Base para construção da estratégia alimentar personalizada;`,
+
+  bioimpedancia:`<b>Avaliação de Composição Corporal — Bioimpedância</b>
+Exame de bioimpedância realizado em parceria com clínica especializada;
+Avaliação inicial e reavaliação ao final do ciclo de 3 meses;
+Dados utilizados para ajuste do protocolo de composição corporal;`,
+
+  digitais:`<b>Entregáveis Digitais</b>
+Manual da Testosterona Natural;
+Guia de Rotina Matinal;
+Protocolo Reset — metodologia de 3 semanas para reset metabólico;
+Acesso a grupo de WhatsApp com suporte e orientações práticas;
+Canal direto para dúvidas em horário comercial;`,
+
   padrao:`<b>📋 Avaliação Inicial</b>
-Avaliação física completa + composição corporal <i>(bioimpedância — início e fim)</i>
-Coleta de teste alimentar imunológico <i>(180-270 tipos de alimentos)</i>
-Coleta e análise de exames laboratoriais <i>(início e fim)</i>
-Análise de perfil comportamento
+Avaliação física completa + composição corporal <i>(bioimpedância — início e fim)</i>;
+Coleta de teste alimentar imunológico <i>(180-270 tipos de alimentos)</i>;
+Coleta e análise de exames laboratoriais <i>(início e fim)</i>;
+Análise de perfil comportamento;
 
 <b>🗺️ Estratégia Personalizada</b>
-Avaliação e personalização da rotina: alimentação, treinamento, sono, descanso e hábitos
-Definição de rota do estado atual → estado desejado
-Entrega da metodologia de 3 semanas "Reset" <i>(pré-teste)</i>
-Estratégia alimentar inicial guiada por teste de sensibilidade
-Orientação de mentalidade e comportamento de acordo com o perfil
+Avaliação e personalização da rotina: alimentação, treinamento, sono, descanso e hábitos;
+Definição de rota do estado atual → estado desejado;
+Entrega da metodologia de 3 semanas "Reset" <i>(pré-teste)</i>;
+Estratégia alimentar inicial guiada por teste de sensibilidade;
+Orientação de mentalidade e comportamento de acordo com o perfil;
 
 <b>🤝 Acompanhamento Contínuo</b>
-Encontros individuais a cada 14 dias | aprox. 1 hora | presencial ou online
-Orientação prática com a Dra. <i>(almoço, podendo incluir cônjuge)</i> → escolhas alimentares
-Orientação e ajustes de suplementação, quando indicados
-Ajustes de tratamento/condutas médicas quando indicados
-Caso indicado reposição, realizada aplicação
-Alinhamento com treinador, nutricionista ou outro profissional, quando necessário
+Encontros individuais a cada 14 dias | aprox. 1 hora | presencial ou online;
+Orientação prática com a Dra. <i>(almoço, podendo incluir cônjuge)</i> → escolhas alimentares;
+Orientação e ajustes de suplementação, quando indicados;
+Ajustes de tratamento/condutas médicas quando indicados;
+Caso indicado reposição, realizada aplicação;
+Alinhamento com treinador, nutricionista ou outro profissional, quando necessário;
 
 <b>📲 Suporte & Recursos</b>
-Canal para dúvidas e orientações práticas
-Grupo de WhatsApp
-Manual da testosterona natural`,
+Canal para dúvidas e orientações práticas;
+Grupo de WhatsApp;
+Manual da testosterona natural;`,
 };
 
 // ════════════════════════════════════
@@ -1147,10 +1207,19 @@ function launchPresentation() {
   // Investimento
   document.getElementById('s7-valor').textContent =
     valor ? fmtR(parseFloat(valor)) : '—';
+  // Formatar prazo com singular/plural correto
+  function fmtPrazo(n, unit) {
+    const num = parseInt(n);
+    if (!n || !unit) return '';
+    const labels = {
+      dia:    num === 1 ? 'dia'    : 'dias',
+      semana: num === 1 ? 'semana' : 'semanas',
+      mes:    num === 1 ? 'mês'    : 'meses',
+    };
+    return `${num} ${labels[unit] || unit}`;
+  }
   document.getElementById('s7-prazo').textContent =
-    (prazo && prazoUnit)
-      ? `${prazo} ${prazoUnit}${parseInt(prazo)>1 && prazoUnit==='mes' ? 'es' : ''}`
-      : '';
+    (prazo && prazoUnit) ? fmtPrazo(prazo, prazoUnit) : '';
 
   const parcelasN = parseInt(document.getElementById('cfg-parcelas').value);
   const parcelaEl = document.getElementById('s7-parcela');
@@ -1180,7 +1249,7 @@ function launchPresentation() {
 
   // Condição especial
   document.getElementById('s8-valor').textContent       = valorCond ? fmtR(parseFloat(valorCond)) : '—';
-  document.getElementById('s8-prazo').textContent       = (prazo && prazoUnit) ? `${prazo} ${prazoUnit}` : '';
+  document.getElementById('s8-prazo').textContent       = (prazo && prazoUnit) ? fmtPrazo(prazo, prazoUnit) : '';
   document.getElementById('s8-desc').textContent        = descCond || '—';
   document.getElementById('s8-valor-cheio').textContent = valor ? fmtR(parseFloat(valor)) : '—';
 
